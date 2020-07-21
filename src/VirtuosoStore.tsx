@@ -110,6 +110,11 @@ const VirtuosoStore = ({
 
   const rangeChanged$ = coldSubject<ListRange>()
 
+  const currentRange: ListRange = {
+    startIndex: 0,
+    endIndex: 0,
+  }
+
   list$
     .pipe(
       withLatestFrom(adjustmentInProgress$),
@@ -121,8 +126,11 @@ const VirtuosoStore = ({
       }),
       duc((current, next) => !current || current.startIndex !== next.startIndex || current.endIndex !== next.endIndex)
     )
-    .subscribe(rangeChanged$.next)
-
+    .subscribe((value: ListRange) => {
+      currentRange.startIndex = value.startIndex
+      currentRange.endIndex = value.endIndex
+      rangeChanged$.next(value)
+    })
   const { isSeeking$, scrollVelocity$, scrollSeekConfiguration$ } = scrollSeekEngine({
     scrollTop$,
     isScrolling$,
@@ -206,6 +214,7 @@ const VirtuosoStore = ({
     scrollTop: makeInput(domScrollTop$),
     topItemCount: makeInput(topItemCount$),
     totalCount: makeInput(totalCount$),
+    currentTotal: totalCount$,
     scrollToIndex: makeInput(scrollToIndex$),
     initialItemCount: makeInput(initialItemCount$),
     followOutput: makeInput(followOutput$),
@@ -238,6 +247,7 @@ const VirtuosoStore = ({
     groupIndices: makeOutput(groupIndices$),
     stickyItemsOffset: makeOutput(stickyItemsOffset$),
     scrollTo: makeOutput(scrollTo$),
+    currentRange: currentRange,
   }
 }
 

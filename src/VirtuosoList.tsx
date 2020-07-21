@@ -49,7 +49,6 @@ export const VirtuosoList: React.FC<{}> = React.memo(() => {
     render && renderedItems.push(render.render(item, props))
     topOffset += item.size
   })
-
   items.forEach(item => {
     if (renderedTopItemIndices.indexOf(item.index) > -1) {
       return
@@ -65,6 +64,5 @@ export const VirtuosoList: React.FC<{}> = React.memo(() => {
         })
       )
   })
-
   return <>{renderedItems}</>
 })

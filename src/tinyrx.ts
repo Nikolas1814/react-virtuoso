@@ -17,6 +17,7 @@ export interface TObservable<T> {
 export interface TSubject<T> extends TObservable<T> {
   next(val: T): void
   subscribers: TSubscriber<T>[]
+  val: T | undefined
 }
 
 function combineOperators<A1>(): TOperator<A1, A1>
@@ -104,6 +105,7 @@ export function subject<T>(initial?: T, distinct = true): TSubject<T> {
   }
 
   return {
+    val,
     next,
     subscribe,
     pipe: buildPipe(subscribe),
@@ -126,6 +128,7 @@ export function coldSubject<T>(): TSubject<T> {
   }
 
   return {
+    val: undefined,
     next,
     subscribe,
     pipe: buildPipe(subscribe),

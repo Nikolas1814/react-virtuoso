@@ -77,6 +77,9 @@ export const VirtuosoPresentation: FC<TVirtuosoPresentationProps> = React.memo(
 export interface VirtuosoMethods {
   scrollToIndex(location: TScrollLocation): void
   adjustForPrependedItems(count: number): void
+  remainScrollPosition(currentTopIndex: number, newElementsCount: number): void
+  prependItems(newItemsCount: number, oldTopIndex: number): void
+  appendItems(newItemsCount: number): void
 }
 
 export const Virtuoso = forwardRef<VirtuosoMethods, VirtuosoProps>((props, ref) => {
@@ -87,9 +90,40 @@ export const Virtuoso = forwardRef<VirtuosoMethods, VirtuosoProps>((props, ref) 
       scrollToIndex: (location: TScrollLocation) => {
         state.scrollToIndex(location)
       },
-
       adjustForPrependedItems: (count: number) => {
         state.adjustForPrependedItems(count)
+      },
+      remainScrollPosition: (currentTopIndex: number, newElementsCount: number) => {
+        window.requestAnimationFrame(() => {
+          state.scrollToIndex({
+            index: currentTopIndex + newElementsCount,
+            align: 'start',
+          })
+        })
+      },
+      prependItems: (newElementsCount: number) => {
+        return new Promise((resolve: any, reject: any) => {
+          window.requestAnimationFrame(() => {
+            if (!state.currentTotal.val) return reject()
+            const current = state.currentTotal.val || 0
+            //console.log('start total', state.currentTotal.val, current)
+            state.totalCount(current + newElementsCount)
+            //console.log('start index', state.currentRange.startIndex)
+            state.scrollToIndex({
+              index: state.currentRange.startIndex + newElementsCount,
+              align: 'start',
+            })
+            resolve()
+          })
+        })
+      },
+      appendItems: (newElementsCount: number) => {
+        return new Promise((resolve: any, reject: any) => {
+          if (!state.currentTotal.val) return reject()
+          const current = state.currentTotal.val || 0
+          state.totalCount(current + newElementsCount)
+          resolve()
+        })
       },
     }),
     [state]
@@ -100,7 +134,6 @@ export const Virtuoso = forwardRef<VirtuosoMethods, VirtuosoProps>((props, ref) 
     state.atBottomStateChange(props.atBottomStateChange)
     state.endReached(props.endReached)
     state.topItemCount(props.topItems || 0)
-    state.totalCount(props.totalCount)
     props.initialItemCount && state.initialItemCount(props.initialItemCount)
     state.itemsRendered(props.itemsRendered)
     state.totalListHeightChanged(props.totalListHeightChanged)
@@ -123,7 +156,7 @@ export const Virtuoso = forwardRef<VirtuosoMethods, VirtuosoProps>((props, ref) 
     props.atBottomStateChange,
     props.endReached,
     props.topItems,
-    props.totalCount,
+    //props.totalCount,
     props.initialItemCount,
     props.itemsRendered,
     props.totalListHeightChanged,
@@ -136,6 +169,9 @@ export const Virtuoso = forwardRef<VirtuosoMethods, VirtuosoProps>((props, ref) 
     props.computeItemKey,
     props.dataKey,
   ])
+  useEffect(() => {
+    state.totalCount(props.totalCount)
+  }, [])
 
   return (
     <VirtuosoPresentation
