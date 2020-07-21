@@ -79,7 +79,7 @@ export interface VirtuosoMethods {
   adjustForPrependedItems(count: number): void
   remainScrollPosition(currentTopIndex: number, newElementsCount: number): void
   prependItems(newItemsCount: number, oldTopIndex: number): void
-  appendItems(newItemsCount: number): void
+  appendItems(newItemsCount: number, scrollToBottom: boolean): void
 }
 
 export const Virtuoso = forwardRef<VirtuosoMethods, VirtuosoProps>((props, ref) => {
@@ -106,8 +106,10 @@ export const Virtuoso = forwardRef<VirtuosoMethods, VirtuosoProps>((props, ref) 
           window.requestAnimationFrame(() => {
             if (!state.currentTotal.val) return reject()
             const current = state.currentTotal.val || 0
+            const newSize = current + newElementsCount
+            state.currentTotal.val = newSize
             //console.log('start total', state.currentTotal.val, current)
-            state.totalCount(current + newElementsCount)
+            state.totalCount(newSize)
             //console.log('start index', state.currentRange.startIndex)
             state.scrollToIndex({
               index: state.currentRange.startIndex + newElementsCount,
@@ -117,11 +119,21 @@ export const Virtuoso = forwardRef<VirtuosoMethods, VirtuosoProps>((props, ref) 
           })
         })
       },
-      appendItems: (newElementsCount: number) => {
+      appendItems: (newElementsCount: number, scrollToBottom: boolean) => {
         return new Promise((resolve: any, reject: any) => {
           if (!state.currentTotal.val) return reject()
           const current = state.currentTotal.val || 0
-          state.totalCount(current + newElementsCount)
+          const newSize = current + newElementsCount
+          state.currentTotal.val = newSize
+          state.totalCount(newSize)
+          if (scrollToBottom) {
+            setTimeout(() => {
+              state.scrollToIndex({
+                index: newSize,
+                align: 'end',
+              })
+            })
+          }
           resolve()
         })
       },

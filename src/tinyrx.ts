@@ -86,7 +86,6 @@ export function observable<T, K>(source: TSubscribe<T>, operator: TOperator<T, K
 export function subject<T>(initial?: T, distinct = true): TSubject<T> {
   let subscribers: TSubscriber<T>[] = []
   let val: T | undefined = initial
-
   const next = (newVal: T) => {
     if (!distinct || newVal !== val) {
       val = newVal
