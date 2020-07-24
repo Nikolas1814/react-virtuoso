@@ -80,6 +80,7 @@ export interface VirtuosoMethods {
   remainScrollPosition(currentTopIndex: number, newElementsCount: number): void
   prependItems(newItemsCount: number, oldTopIndex: number): void
   appendItems(newItemsCount: number, scrollToBottom: boolean): void
+  setItemsSize(size: number): void
 }
 
 export const Virtuoso = forwardRef<VirtuosoMethods, VirtuosoProps>((props, ref) => {
@@ -136,6 +137,16 @@ export const Virtuoso = forwardRef<VirtuosoMethods, VirtuosoProps>((props, ref) 
           }
           resolve()
         })
+      },
+      setItemsSize: (size: number) => {
+        if (state.currentTotal?.val !== undefined) {
+          if (state.currentTotal.val !== size) {
+            state.currentTotal.val = size
+            state.totalCount(size)
+          }
+        } else {
+          state.totalCount(size)
+        }
       },
     }),
     [state]

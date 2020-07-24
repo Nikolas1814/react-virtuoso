@@ -2805,6 +2805,18 @@ var Virtuoso = /*#__PURE__*/React.forwardRef(function (props, ref) {
 
           resolve();
         });
+      },
+      setItemsSize: function setItemsSize(size) {
+        var _state$currentTotal;
+
+        if (((_state$currentTotal = state.currentTotal) === null || _state$currentTotal === void 0 ? void 0 : _state$currentTotal.val) !== undefined) {
+          if (state.currentTotal.val !== size) {
+            state.currentTotal.val = size;
+            state.totalCount(size);
+          }
+        } else {
+          state.totalCount(size);
+        }
       }
     };
   }, [state]);
